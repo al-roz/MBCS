@@ -56,7 +56,7 @@ class ClientModel
             SendMsg("Login " + UserName + " " + UserPassword);
             string receiveMsg = ReceiveMsg().ToString();
         
-             if (receiveMsg == "accept")
+             if (receiveMsg == "complited")
              {
                  break;
              }
@@ -77,7 +77,7 @@ class ClientModel
 
         if (Stream != null)
         {
-            Console.WriteLine("Accepted");
+            Console.WriteLine("complited");
         }
         
     }
@@ -155,14 +155,11 @@ class ClientModel
         {
             string msg = ReadRequest();
             SendMsg(msg);
-
-            // while (true)
-            // {
-            //     StringBuilder serverMsg = ReceiveMsg();
-            //     if (serverMsg.ToString() == "ir") break;
-            //     Console.WriteLine(serverMsg);    
-            // }
             StringBuilder serverMsg = ReceiveMsg();
+            if (serverMsg.ToString() != "complited")
+            {
+                Console.WriteLine(serverMsg.ToString());
+            }
         }
     }
 }

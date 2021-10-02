@@ -8,6 +8,7 @@ using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 
 static class CommandManager
@@ -36,92 +37,60 @@ static class CommandManager
 
     private const int ADD_USER_LEN = 4;
     private const int REMOVE_USER_LEN = 2;
-    private const int CHANGE_PASSWORD_LEN = 0;
+    private const int CHANGE_PASSWORD_LEN = 4;
     private const int GET_USERS_INFO_LEN = 0;
 
     private const string UNK_COMMAND = "Unknown command";
 
-    private const string FILE_PATH = @"F:\VS\MBCS\Server\Server\user.json";
-
-    static private MenuItem Users;
-    
 
     static private string AddUser(string login, string passwordHash, string privileges)
     {
-        if (File.Exists(FILE_PATH))
+        ResultExecutingCommand result = JsonManager.AddUser(new User(login,passwordHash,privileges == "admin"));
+
+        if (result == ResultExecutingCommand.CompletedSuccessfully)
         {
-            Users = JsonConvert.DeserializeObject<MenuItem>(File.ReadAllText(FILE_PATH));
-            if (Users == null)
-            {
-                Users = new MenuItem();
-                Users.users = new List<User>();
-            }
+            return "complited";
         }
-        
-        if (Users != null && Users.users.Any(i => login == i.login))
-        {
-            return $"{login} already exist";
-        }
-        
-        Users?.users.Add(new User(login,passwordHash,privileges == "admin"));
-        
-        File.WriteAllText(FILE_PATH, JsonConvert.SerializeObject(Users));
-        
-        // ResultExecutingCommand result = JsonManager.AddUser(new User(login,passwordHash,privileges == "admin"));
-        //
-        // if (result == ResultExecutingCommand.CompletedSuccessfully)
-        // {
-        //     return "complited";
-        // }
-        //
-        // return "wrong";
-        
-        return "";
+        return "wrong";
     }
 
     static private string Login(string login, string passwordHash)
     {
-        if (File.Exists(FILE_PATH))
+        ResultExecutingCommand result = JsonManager.Login(new User(login, passwordHash,false));
+        if (result == ResultExecutingCommand.CompletedSuccessfully)
         {
-            Users = JsonConvert.DeserializeObject<MenuItem>(File.ReadAllText(FILE_PATH));
-        }
-
-        if (Users != null && Users.users.Any(i => (login == i.login) && (passwordHash == i.passwordHash)))
-        {
-            return "accept";
+            return "complited";
         }
         return "invalid log or password";
     }
 
-    static private string Remove_user(string userLogin)
+    static private string RemoveUser(string userLogin)
     {
-        if (File.Exists(FILE_PATH))
-        {
-            Users = JsonConvert.DeserializeObject<MenuItem>(File.ReadAllText(FILE_PATH));
-        }
 
-        foreach (var i in Users.users.Where(i => i.login == userLogin))
+        ResultExecutingCommand result = JsonManager.RemoveUser(userLogin);
+        if (result == ResultExecutingCommand.CompletedSuccessfully)
         {
-            Users.users.Remove(i);
-            break;
+            return "complited";
         }
-        
-        File.WriteAllText(FILE_PATH, JsonConvert.SerializeObject(Users));
-        
-        return "accept";
+        return "wrong";
     }
 
-    static public User GetUser(string userLogin)
+    static private string ChangePassword(string userLogin, string oldPassword, string newPassword)
     {
-        foreach (var i in Users.users.Where(i => i.login == userLogin))
+        ResultExecutingCommand result = JsonManager.ChangePassword(userLogin, oldPassword, newPassword);
+        if (result == ResultExecutingCommand.CompletedSuccessfully)
         {
-            return i;
+            return "complited";
         }
-
-        return null;
+        return "wrong";
     }
 
-    static public string HandleCommand(string command)
+    static private string GetUserInfo(User clinet)
+    {
+        return clinet == null ? "Client null" : clinet.login;
+    }
+
+    static public string HandleCommand(string command, ref User client)
     {
         string[] args = command.Split(' ');
         string key = args[0].ToLower();
@@ -140,7 +109,11 @@ static class CommandManager
             {
                 if (args.Length >= LOGIN_LEN)
                 {
-                    result = Login(args[1], args[2]); 
+                    result = Login(args[1], args[2]);
+                    if (result == "complited")
+                    {
+                        client = JsonManager.GetClient(args[1]);
+                    }
                 }
                 break;
             }
@@ -148,8 +121,25 @@ static class CommandManager
             {
                 if (args.Length >= REMOVE_USER_LEN)
                 {
-                    result = Remove_user(args[1]);
+                    result = RemoveUser(args[1]);
                 }
+                break;
+            }
+            case CHANGE_PASSWORD:
+            {
+                if (args.Length >= CHANGE_PASSWORD_LEN)
+                {
+                    result = ChangePassword(args[1], args[2], args[3]);
+                }
+                break;
+            }
+            case GET_USERS_INFO:
+            {
+                result = GetUserInfo(client);
+                break;
+            }
+            case HELP:
+            {
                 break;
             }
             default:

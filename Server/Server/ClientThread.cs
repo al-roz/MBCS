@@ -23,7 +23,6 @@ class ClientThread
     {
         StringBuilder builderRet = new StringBuilder();
         byte[] data = new byte[4096];
-        
         do
         {
             int bytes = stream.Read(data, 0, data.Length);
@@ -49,7 +48,7 @@ class ClientThread
             {
                 string msg = ReadData().ToString();
                 
-                string resultMsg = CommandManager.HandleCommand(msg);
+                string resultMsg = CommandManager.HandleCommand(msg, ref UserInfo);
 
                 if (resultMsg != "")
                 {
