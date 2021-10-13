@@ -10,7 +10,8 @@ public enum ResultExecutingCommand
 {
     CompletedSuccessfully = 0,
     UserInList = 1,
-    UserNotInList = 2
+    UserNotInList = 2,
+    UserLogged = 3
 }
 
 static public class JsonManager
@@ -19,6 +20,7 @@ static public class JsonManager
     
     private const string FILE_PATH = @"F:\VS\MBCS\Server\Server\user.json";
 
+    static public List<string> loggedUsers = new List<string>();
     static private MenuItem LoadUsers()
     {
         return JsonConvert.DeserializeObject<MenuItem>(File.ReadAllText(FILE_PATH));
@@ -42,6 +44,11 @@ static public class JsonManager
     static public User GetClient(string userLogin)
     {
         return FindUserInListOnLogin(userLogin);
+    }
+
+    static public ResultExecutingCommand CheckUserOnLogin(string userLogin)
+    {
+        return loggedUsers.Any(t => t == userLogin) ? ResultExecutingCommand.UserLogged : ResultExecutingCommand.CompletedSuccessfully;
     }
     
     static public ResultExecutingCommand AddUser(User newUser)
@@ -96,6 +103,7 @@ static public class JsonManager
                 return ResultExecutingCommand.UserNotInList;
             }
         }
+        loggedUsers.Add(incomingUser.login);
         return ResultExecutingCommand.CompletedSuccessfully;
     }
 

@@ -22,10 +22,10 @@ static class CommandManager
     private const string LOGOUT = "logout";
     private const string LOGIN = "login";
     
-    private const int CD_LEN = 0;
+    private const int CD_LEN = 2;
     private const int HELP_LEN = 0;
-    private const int WRITE_LEN = 0;
-    private const int READ_LEN = 0;
+    private const int WRITE_LEN = 3;
+    private const int READ_LEN = 2;
     private const int LS_LEN = 0;
     private const int LOGUT_LEN = 0;
     private const int LOGIN_LEN = 3;
@@ -109,10 +109,16 @@ static class CommandManager
             {
                 if (args.Length >= LOGIN_LEN)
                 {
+                    if (JsonManager.CheckUserOnLogin(args[1]) == ResultExecutingCommand.UserLogged)
+                    {
+                        result = "UserLogged";
+                        break;
+                    }
                     result = Login(args[1], args[2]);
                     if (result == "complited")
                     {
                         client = JsonManager.GetClient(args[1]);
+                        client.userDirectory = new DirectoryManager(client.login);
                     }
                 }
                 break;
@@ -140,6 +146,52 @@ static class CommandManager
             }
             case HELP:
             {
+                break;
+            }
+            case CD:
+            {
+                if (args.Length >= CD_LEN)
+                {
+                    client.userDirectory.DownToTheDirectory(args[1]);    
+                }
+                else
+                {
+                    client.userDirectory.UpToTheParentDirectory();
+                }
+
+                result = "complited";
+                break;
+            }
+            case LS:
+            {
+                List<string> res = client.userDirectory.GetFileAndDir();
+                StringBuilder tmpMsg = new StringBuilder();
+                foreach (var i in res)
+                {
+                    tmpMsg.Append(i + " ");
+                }
+
+                result = tmpMsg.ToString();
+                break;
+            }
+            case READ:
+            {
+                if (args.Length >= READ_LEN)
+                   result = client.userDirectory.ReadFile(args[1]);
+                break;
+            }
+            case WRITE:
+            {
+                if (args.Length >= WRITE_LEN)
+                {
+                    client.userDirectory.WriteFile(args[1],args[2]);
+                }
+                result = "complited";
+                break;
+            }
+            case LOGOUT:
+            {
+                result = "";
                 break;
             }
             default:

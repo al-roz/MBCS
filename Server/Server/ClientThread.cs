@@ -53,8 +53,15 @@ class ClientThread
                 if (resultMsg != "")
                 {
                     msg = resultMsg;
-                    SendMsg(msg);    
+                    SendMsg(msg);
                 }
+                else
+                {
+                    JsonManager.loggedUsers.Remove(UserInfo.login);
+                    msg = "relog";
+                    SendMsg(msg);
+                }
+
             }
         }
         catch (Exception ex)
@@ -63,6 +70,7 @@ class ClientThread
         }
         finally
         {
+            JsonManager.loggedUsers.Remove(UserInfo.login);
             stream?.Close();
             Client?.Close();
         }

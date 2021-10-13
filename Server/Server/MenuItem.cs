@@ -10,7 +10,7 @@ public class User
     [JsonProperty("passwordHash")] public string passwordHash;
     [JsonProperty("privileges")] public bool isAdmin;
 
-    [JsonIgnore] public bool isActive;
+    [JsonIgnore] public DirectoryManager userDirectory;
 
     public User(string newLogin, string newPasswordHash, bool newIsAdmin)
     {

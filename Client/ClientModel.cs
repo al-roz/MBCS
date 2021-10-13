@@ -79,7 +79,6 @@ class ClientModel
         {
             Console.WriteLine("complited");
         }
-        
     }
 
     private void SendMsg(string msg)
@@ -124,11 +123,6 @@ class ClientModel
                 }
                 break;
             }
-            case LOGOUT:
-            {
-                Login();
-                break;
-            }
             case CHANGE_PASSWORD:
             {
                 if (args.Length >= 4)
@@ -159,6 +153,11 @@ class ClientModel
             if (serverMsg.ToString() != "complited")
             {
                 Console.WriteLine(serverMsg.ToString());
+            }
+
+            if (serverMsg.ToString() == "relog")
+            {
+                Login();
             }
         }
     }
