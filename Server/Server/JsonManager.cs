@@ -1,9 +1,6 @@
-﻿
-using System.Collections.Generic;
-using System.ComponentModel.Design;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection.Metadata;
 using Newtonsoft.Json;
 
 public enum ResultExecutingCommand
@@ -98,7 +95,7 @@ static public class JsonManager
         if (File.Exists(FILE_PATH))
         {
             Users = LoadUsers();
-            if (FindUserInListOnLogin(incomingUser.login) == null)
+            if (FindUserInListOnLoginAndPassword(incomingUser.login,incomingUser.passwordHash) == null)
             {
                 return ResultExecutingCommand.UserNotInList;
             }

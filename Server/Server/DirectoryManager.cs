@@ -9,7 +9,7 @@ public class DirectoryManager
 {
     private StringBuilder userPath = new StringBuilder(@"F:\VS\MBCS\Users");
     
-    private StringBuilder path = new StringBuilder(@"F:\VS\MBCS\Users");
+    public StringBuilder path = new StringBuilder(@"F:\VS\MBCS\Users");
 
     private bool CheckDirectoryInFolder(string checkedDirectory)
     {

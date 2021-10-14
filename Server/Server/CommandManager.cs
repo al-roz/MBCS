@@ -1,14 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Reflection.Metadata;
+﻿using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using JsonSerializer = System.Text.Json.JsonSerializer;
+
 
 
 static class CommandManager
@@ -21,6 +13,11 @@ static class CommandManager
     private const string LS = "ls";
     private const string LOGOUT = "logout";
     private const string LOGIN = "login";
+    private const string PATH = "path";
+    private const string HOME = "home";
+
+    private const string CMD_HELP = CD + "\n" + HELP + "\n" + WRITE + "\n" + READ + "\n" + LS + "\n" + LOGOUT + "\n" + LOGOUT + "\n"
+                                    + LOGIN + "\n" + PATH + "\n" + HOME + "\n" + ADD_USER + "\n" + REMOVE_USER + "\n" + CHANGE_PASSWORD + "\n" + GET_USERS_INFO; 
     
     private const int CD_LEN = 2;
     private const int HELP_LEN = 0;
@@ -101,7 +98,7 @@ static class CommandManager
             {
                 if (args.Length >= ADD_USER_LEN)
                 {
-                    result = AddUser(args[1], args[2], args[3]);
+                    result = client.isAdmin ? AddUser(args[1], args[2], args[3]) : "you don't have the right";
                 }
                 break;
             }
@@ -127,7 +124,7 @@ static class CommandManager
             {
                 if (args.Length >= REMOVE_USER_LEN)
                 {
-                    result = RemoveUser(args[1]);
+                    result = client.isAdmin ? RemoveUser(args[1]) : "you don't have the right";
                 }
                 break;
             }
@@ -135,7 +132,7 @@ static class CommandManager
             {
                 if (args.Length >= CHANGE_PASSWORD_LEN)
                 {
-                    result = ChangePassword(args[1], args[2], args[3]);
+                    result = client.isAdmin ? ChangePassword(args[1], args[2], args[3]) : "you don't have the right";
                 }
                 break;
             }
@@ -146,6 +143,7 @@ static class CommandManager
             }
             case HELP:
             {
+                result = CMD_HELP;
                 break;
             }
             case CD:
@@ -192,6 +190,17 @@ static class CommandManager
             case LOGOUT:
             {
                 result = "";
+                break;
+            }
+            case PATH:
+            {
+                result = client.userDirectory.path.ToString();
+                break;
+            }
+            case HOME:
+            {
+                client.userDirectory.BackToStartDirectory();
+                result = "complited";
                 break;
             }
             default:
