@@ -5,6 +5,10 @@ using System.Text;
 
 static class CommandManager
 {
+
+    private const string result_complited = "complited";
+    private const string result_wrong = "wrong";
+    
     
     private const string CD = "cd";
     private const string HELP = "help";
@@ -16,8 +20,9 @@ static class CommandManager
     private const string PATH = "path";
     private const string HOME = "home";
 
-    private const string CMD_HELP = CD + "\n" + HELP + "\n" + WRITE + "\n" + READ + "\n" + LS + "\n" + LOGOUT + "\n" + LOGOUT + "\n"
-                                    + LOGIN + "\n" + PATH + "\n" + HOME + "\n" + ADD_USER + "\n" + REMOVE_USER + "\n" + CHANGE_PASSWORD + "\n" + GET_USERS_INFO; 
+    private const string CMD_HELP = CD + "\n" + HELP + "\n" + WRITE + "\n" + READ + "\n" + LS + "\n" + LOGOUT  + "\n"
+                                    + LOGIN + "\n" + PATH + "\n" + HOME + "\n" + ADD_USER + "\n" + REMOVE_USER + "\n" 
+                                    + CHANGE_PASSWORD + "\n" + GET_USERS_INFO + "\n" + ADD_USER_GROUP + "\n" + REMOVE_USER_GROUP; 
     
     private const int CD_LEN = 2;
     private const int HELP_LEN = 0;
@@ -31,11 +36,16 @@ static class CommandManager
     private const string REMOVE_USER = "remove_user";
     private const string CHANGE_PASSWORD = "change_pswd";
     private const string GET_USERS_INFO = "get_users_info";
+    private const string ADD_USER_GROUP = "add_user_to_group";
+    private const string REMOVE_USER_GROUP = "remove_user_to_group";
 
     private const int ADD_USER_LEN = 4;
     private const int REMOVE_USER_LEN = 2;
     private const int CHANGE_PASSWORD_LEN = 4;
     private const int GET_USERS_INFO_LEN = 0;
+    private const int ADD_USER_GROUP_LEN = 3;
+    private const int REMOVE_USER_GROUP_LEN = 3;
+
 
     private const string UNK_COMMAND = "Unknown command";
 
@@ -46,7 +56,7 @@ static class CommandManager
 
         if (result == ResultExecutingCommand.CompletedSuccessfully)
         {
-            return "complited";
+            return result_complited;
         }
         return "wrong";
     }
@@ -56,7 +66,7 @@ static class CommandManager
         ResultExecutingCommand result = JsonManager.Login(new User(login, passwordHash,false));
         if (result == ResultExecutingCommand.CompletedSuccessfully)
         {
-            return "complited";
+            return result_complited;
         }
         return "invalid log or password";
     }
@@ -67,7 +77,7 @@ static class CommandManager
         ResultExecutingCommand result = JsonManager.RemoveUser(userLogin);
         if (result == ResultExecutingCommand.CompletedSuccessfully)
         {
-            return "complited";
+            return result_complited;
         }
         return "wrong";
     }
@@ -77,7 +87,7 @@ static class CommandManager
         ResultExecutingCommand result = JsonManager.ChangePassword(userLogin, oldPassword, newPassword);
         if (result == ResultExecutingCommand.CompletedSuccessfully)
         {
-            return "complited";
+            return result_complited;
         }
         return "wrong";
     }
@@ -86,6 +96,19 @@ static class CommandManager
     {
         return clinet == null ? "Client null" : clinet.login;
     }
+
+    static private string AddUserGroup(string userLogin, string groupName)
+    {
+        ResultExecutingCommand result = JsonManager.AddGroupToUser(userLogin, groupName);
+        return result == ResultExecutingCommand.CompletedSuccessfully ? result_complited : result_wrong;
+    }
+
+    static private string RemoveUserGroup(string userLogin, string groupName)
+    {
+        ResultExecutingCommand result = JsonManager.RemoveGroupToUser(userLogin, groupName);
+        return result == ResultExecutingCommand.CompletedSuccessfully ? result_complited : result_wrong;
+    }
+    
 
     static public string HandleCommand(string command, ref User client)
     {
@@ -201,6 +224,30 @@ static class CommandManager
             {
                 client.userDirectory.BackToStartDirectory();
                 result = "complited";
+                break;
+            }
+            case ADD_USER_GROUP:
+            {
+                if (args.Length >= ADD_USER_GROUP_LEN && client.isAdmin)
+                {
+                    result = AddUserGroup(args[1], args[2]);
+                }
+                else
+                {
+                    result = result_wrong;
+                }
+                break;
+            }
+            case REMOVE_USER_GROUP:
+            {
+                if (args.Length >= REMOVE_USER_GROUP_LEN && client.isAdmin)
+                {
+                    result = RemoveUserGroup(args[1], args[2]);
+                }
+                else
+                {
+                    result = result_wrong;
+                }
                 break;
             }
             default:

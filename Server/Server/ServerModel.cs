@@ -12,8 +12,6 @@ class ServerModel
     private const string address = "127.0.0.1";
 
     private TcpListener listener;
-    
-    
 
     public void StartServer()
     {

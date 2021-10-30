@@ -7,6 +7,7 @@ public class User
     [JsonProperty("login")] public string login;
     [JsonProperty("passwordHash")] public string passwordHash;
     [JsonProperty("privileges")] public bool isAdmin;
+    [JsonProperty("groups")] public List<string> groups;
 
     [JsonIgnore] public DirectoryManager userDirectory;
 
@@ -17,7 +18,6 @@ public class User
         isAdmin = newIsAdmin;
     }
 }
-
 public class MenuItem
 {
     public List<User> users;

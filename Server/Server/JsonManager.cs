@@ -125,4 +125,45 @@ static public class JsonManager
         
         return ResultExecutingCommand.CompletedSuccessfully;
     }
+
+    public static ResultExecutingCommand AddGroupToUser(string userLogin, string groupName)
+    {
+        if (File.Exists(FILE_PATH))
+        {
+            Users = LoadUsers();
+            User user = FindUserInListOnLogin(userLogin);
+            if (userLogin == null)
+            {
+                return ResultExecutingCommand.UserNotInList;
+            }
+
+            Users.users.Remove(user);
+            user.groups ??= new List<string>();
+            user.groups.Add(groupName);
+            Users.users.Add(user);
+            
+            UploadUsers();
+        }
+        return ResultExecutingCommand.CompletedSuccessfully;
+    }
+
+    public static ResultExecutingCommand RemoveGroupToUser(string userLogin, string groupName)
+    {
+        if (File.Exists(FILE_PATH))
+        {
+            Users = LoadUsers();
+            User user = FindUserInListOnLogin(userLogin);
+            if (user == null)
+            {
+                return ResultExecutingCommand.UserNotInList;
+            }
+            Users.users.Remove(user);
+            user.groups ??= new List<string>();
+            user.groups.Remove(groupName);
+            Users.users.Add(user);
+            
+            UploadUsers();
+        }
+        return ResultExecutingCommand.CompletedSuccessfully;
+    }
 }
